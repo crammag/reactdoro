@@ -1,2 +1,2 @@
-# boilerplate-webpack-react-ts
- Boilerplate for react and typescript bundled with webpack and hmr.
+# reactdoro
+ A pomodoro-like app made with react and Typescript.
