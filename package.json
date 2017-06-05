@@ -1,9 +1,9 @@
 {
   "name": "boilerplate-webpack-react-ts",
   "version": "1.0.0",
-  "description": " Boilerplate for react and typescript bundled with webpack and hmr",
+  "description": "A pomodoro-like app made with react and Typescript.",
   "keywords": [
-    "boilerplate",
+    "pomodoro",
     "hmtl",
     "typescript",
     "react",
@@ -15,22 +15,19 @@
     "start": "webpack-dev-server"
   },
   "author": {
-    "name": "Albert Cuartiella",
-    "email": "cuarti1992@gmail.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/cuarti/boilerplate-webpack-react-ts.git"
+    "name": "Mark AG",
+    "email": "arga.marc.01@gmail.com"
   },
   "bugs": {
-    "url": "https://github.com/cuarti/boilerplate-webpack-react-ts/issues"
+    "url": "https://github.com/crammag/reactdoro/issues"
   },
-  "homepage": "https://github.com/cuarti/boilerplate-webpack-react-ts#readme",
+  "homepage": "https://github.com/crammag/reactdoro#readme",
   "dependencies": {
     "@types/node": "^7.0.12",
     "@types/react": "^15.0.20",
     "@types/react-dom": "^0.14.23",
     "react": "^15.4.2",
+    "react-bootstrap": "^0.31.0",
     "react-dom": "^15.4.2"
   },
   "devDependencies": {
