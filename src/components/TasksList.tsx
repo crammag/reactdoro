@@ -3,6 +3,7 @@ import * as React from 'react';
 import {Component} from 'react';
 
 import SimpleForm from './SimpleForm';
+import ListItem from './ListItem';
 
 export interface TasksListProps {
     completed: boolean;
@@ -25,6 +26,7 @@ export default class TasksList extends Component<TasksListProps, TasksListState>
         this.loadFromStorage(props.completed || false);
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmitForm = this.handleSubmitForm.bind(this);
+        this.handleRemoveTask = this.handleRemoveTask.bind(this);
     }
 
     private loadFromStorage(completed: boolean) {
@@ -47,6 +49,12 @@ export default class TasksList extends Component<TasksListProps, TasksListState>
         event.target.firstChild.value = ""; //todo check a better way to clear the input value on submit
     }
 
+    private handleRemoveTask(index: number) {
+        this.tasks.splice(index, 1);
+        this.setState({tasks: this.tasks});
+        localStorage.setItem(this.localStorageKey, JSON.stringify(this.tasks));
+    }
+
     private addTask(task: string) {
         this.tasks.push(task);
         this.setState({tasks: this.tasks});
@@ -57,8 +65,8 @@ export default class TasksList extends Component<TasksListProps, TasksListState>
 
         return <ul>
             {this.tasks.length != 0 ? this.tasks.map((task,index) => {
-                    return <li key={index}>{task}</li>
-            }) : <li key="0"/>}
+                    return <ListItem key={index} task={task} onDelete={this.handleRemoveTask} onMark={()=>{}}/>
+            }) : null}
 
             {!this.props.completed && <SimpleForm placeholder="Add a new task..." buttonText="Add"
                                                   onChange={this.handleInputChange} onSubmit={this.handleSubmitForm} />}
