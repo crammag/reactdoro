@@ -1,6 +1,7 @@
 
 import * as React from 'react';
 import {Col, Panel} from 'react-bootstrap';
+import TasksList from './TasksList';
 
 
 export default class App extends React.Component<undefined, undefined> {
@@ -23,10 +24,7 @@ export default class App extends React.Component<undefined, undefined> {
             <Col xs={12} md={4}>
 
                 <Panel header={"Tasks to do"} bsStyle="primary">
-                    <ul>
-                        <li>A</li>
-                        <li>B</li>
-                    </ul>
+                    <TasksList completed={false} />
                 </Panel>
 
             </Col>
@@ -34,10 +32,7 @@ export default class App extends React.Component<undefined, undefined> {
             <Col xs={12} md={4}>
 
                 <Panel header={"Completed Tasks"} bsStyle="primary">
-                    <ul>
-                        <li>A</li>
-                        <li>B</li>
-                    </ul>
+                    <TasksList completed={true} />
                 </Panel>
 
             </Col>
