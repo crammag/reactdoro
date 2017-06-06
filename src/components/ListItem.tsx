@@ -1,10 +1,10 @@
 
 import * as React from 'react';
 import {Component} from 'react';
+import {Task} from '../model/Task';
 
 export interface ListItemProps {
-    key: number;
-    task: string;
+    task: Task;
     onDelete: any;
     onMark: any;
 }
@@ -12,7 +12,7 @@ export interface ListItemProps {
 export default class ListItem extends Component<ListItemProps, {}> {
 
     render() {
-        return <li key={this.props.key}>{this.props.task} <button onClick={() => this.props.onDelete(this.props.key)}>Delete</button></li>;
+        return <li>{this.props.task.name} <button onClick={() => this.props.onDelete(this.props.task.id)}>Delete</button></li>;
     }
 
 }

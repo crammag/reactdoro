@@ -4,37 +4,28 @@ import {Component} from 'react';
 
 import SimpleForm from './SimpleForm';
 import ListItem from './ListItem';
+import LocalStorageManager from '../model/LocalStorageManager';
+import {Task} from '../model/Task';
 
 export interface TasksListProps {
     completed: boolean;
 }
 
 export interface TasksListState {
-    tasks: string[];
+    tasks: Task[];
     inputValue?: string;
 }
 
 export default class TasksList extends Component<TasksListProps, TasksListState> {
 
-    private tasks: string[];
-    private localStorageKey: string;
+    private manager: LocalStorageManager<Task>;
 
     public constructor(props: TasksListProps, context: any) {
         super(props,context);
-        this.tasks = [];
-        this.localStorageKey = props.completed ? "completedTasks" : "pendingTasks";
-        this.loadFromStorage(props.completed || false);
+        this.manager = new LocalStorageManager<Task>(props.completed ? "completedTasks" : "pendingTasks");
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmitForm = this.handleSubmitForm.bind(this);
         this.handleRemoveTask = this.handleRemoveTask.bind(this);
-    }
-
-    private loadFromStorage(completed: boolean) {
-        let rawTasks = localStorage.getItem(this.localStorageKey);
-
-        if (rawTasks) {
-            this.tasks = JSON.parse(rawTasks);
-        }
     }
 
     private handleInputChange(event: any): void {
@@ -43,29 +34,25 @@ export default class TasksList extends Component<TasksListProps, TasksListState>
 
     private handleSubmitForm(event: any): void {
         event.preventDefault();
-        console.log("submitted!");
-        this.addTask(this.state.inputValue);
+
+        this.manager.addObject({id:"", name: this.state.inputValue, assignedTime:25});
+        this.setState({tasks: this.manager.getObjects()});
 
         event.target.firstChild.value = ""; //todo check a better way to clear the input value on submit
     }
 
-    private handleRemoveTask(index: number) {
-        this.tasks.splice(index, 1);
-        this.setState({tasks: this.tasks});
-        localStorage.setItem(this.localStorageKey, JSON.stringify(this.tasks));
-    }
-
-    private addTask(task: string) {
-        this.tasks.push(task);
-        this.setState({tasks: this.tasks});
-        localStorage.setItem(this.localStorageKey, JSON.stringify(this.tasks));
+    private handleRemoveTask(id: string) {
+        this.manager.removeObject(id);
+        this.setState({tasks: this.manager.getObjects()});
     }
 
     render(): JSX.Element {
 
+        let objects = this.manager.getObjects();
+
         return <ul>
-            {this.tasks.length != 0 ? this.tasks.map((task,index) => {
-                    return <ListItem key={index} task={task} onDelete={this.handleRemoveTask} onMark={()=>{}}/>
+            {objects.length != 0 ? objects.map((task,index) => {
+                    return <ListItem key={task.id} task={task} onDelete={this.handleRemoveTask} onMark={()=>{}}/>
             }) : null}
 
             {!this.props.completed && <SimpleForm placeholder="Add a new task..." buttonText="Add"
