@@ -2,6 +2,7 @@
 import * as React from 'react';
 import {Col, Panel} from 'react-bootstrap';
 import TasksList from './TasksList';
+import Timer from './Timer';
 
 
 export default class App extends React.Component<undefined, undefined> {
@@ -16,7 +17,7 @@ export default class App extends React.Component<undefined, undefined> {
             <Col xs={12} md={4}>
 
                 <Panel header={"Timer"} bsStyle="primary">
-                    00:00
+                    <Timer minutes={25} />
                 </Panel>
 
             </Col>
