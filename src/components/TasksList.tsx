@@ -59,8 +59,6 @@ export default class TasksList extends Component<TasksListProps, TasksListState>
 
         let objects = this.props.tasks;
 
-        console.log(this.handleRemoveTask);
-
         return <ul style={{padding: 1}}>
             {objects.map((task) => {
                     return <ListItem

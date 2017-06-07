@@ -49,10 +49,7 @@ export default class ListItem extends Component<ListItemProps, ListItemState> {
 
             <button
                 style={{float: "right"}}
-                onClick={event => {
-                    console.log(this);
-                    this.props.onDelete(this.props.task, event)
-                } }> Delete
+                onClick={event => this.props.onDelete(this.props.task, event)}> Delete
             </button>
 
         </li>;
