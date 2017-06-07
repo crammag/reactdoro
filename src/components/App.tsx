@@ -18,17 +18,23 @@ export interface AppState {
 export default class App extends React.Component<{}, AppState> {
 
     public constructor(props: any, context: any) {
+
         super(props, context);
 
         this.state = {tasks: new LocalStorageManager<Task>('pendingTasks'),
             completedTasks: new LocalStorageManager<Task>('completedTasks'),
-            activeTask: null
+            activeTask: {id:null, name: '', assignedTime:25}
         };
 
         this.handleAddOrRemoveTask = this.handleAddOrRemoveTask.bind(this);
+        this.handleSelectActiveTask = this.handleSelectActiveTask.bind(this);
+        this.handleCompleteTask = this.handleCompleteTask.bind(this);
+        this.handleIncompleteTask = this.handleIncompleteTask.bind(this);
+
     }
 
     private handleAddOrRemoveTask(completed: boolean, taskToAddOrRemove: Task, add: boolean): void {
+
         let selectedManager = completed ? this.state.completedTasks : this.state.tasks;
 
         add ? selectedManager.addObject(taskToAddOrRemove) : selectedManager.removeObject(taskToAddOrRemove.id);
@@ -41,6 +47,19 @@ export default class App extends React.Component<{}, AppState> {
 
     }
 
+    private handleSelectActiveTask(selectedTask: Task) {
+        this.setState({activeTask: selectedTask});
+    }
+
+    private handleCompleteTask(completedTask: Task) {
+        this.handleAddOrRemoveTask(false, completedTask, false);
+        this.handleAddOrRemoveTask(true, completedTask, true);
+    }
+
+    private handleIncompleteTask(incompletedTask: Task) {
+        this.setState({activeTask: {id: '', name: '', assignedTime: incompletedTask.assignedTime}});
+    }
+
     public render(): JSX.Element {
         return <div>
             <Col xs={12} className="text-center">
@@ -51,8 +70,14 @@ export default class App extends React.Component<{}, AppState> {
             <Col xs={12} md={4}>
 
                 <Panel header={"Tasks to do"} bsStyle="primary">
-                    <TasksList completed={false} onAddTask={this.handleAddOrRemoveTask}
-                               onRemoveTask={this.handleAddOrRemoveTask} tasks={this.state.tasks.getObjects()} />
+
+                    <TasksList
+                        completed={false}
+                        onAddTask={this.handleAddOrRemoveTask}
+                        onRemoveTask={this.handleAddOrRemoveTask}
+                        onSelectTask={this.handleSelectActiveTask}
+                        tasks={this.state.tasks.getObjects()} />
+
                 </Panel>
 
             </Col>
@@ -60,7 +85,11 @@ export default class App extends React.Component<{}, AppState> {
             <Col xs={12} md={4}>
 
                 <Panel header={"Timer"} bsStyle="primary">
-                    <Timer minutes={1} activeTask={this.state.activeTask}/>
+                    <Timer
+                        minutes={this.state.activeTask.assignedTime}
+                        activeTask={this.state.activeTask}
+                        onCompleteTask={this.handleCompleteTask}
+                        onIncompleteTask={this.handleIncompleteTask} />
                 </Panel>
 
             </Col>
@@ -68,8 +97,12 @@ export default class App extends React.Component<{}, AppState> {
             <Col xs={12} md={4}>
 
                 <Panel header={"Completed Tasks"} bsStyle="primary">
-                    <TasksList completed={true} onRemoveTask={this.handleAddOrRemoveTask}
-                               tasks={this.state.completedTasks.getObjects()}/>
+
+                    <TasksList
+                        completed={true}
+                        onRemoveTask={this.handleAddOrRemoveTask}
+                        tasks={this.state.completedTasks.getObjects()} />
+
                 </Panel>
 
             </Col>

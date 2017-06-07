@@ -6,6 +6,8 @@ import Task from '../model/Task';
 export interface TimerProps {
     minutes: number;
     activeTask: Task;
+    onCompleteTask: any;
+    onIncompleteTask: any;
 }
 
 export interface TimerState {
@@ -15,16 +17,35 @@ export interface TimerState {
 
 export default class Timer extends Component<TimerProps, TimerState> {
 
-    private intervalID: any;
     private rgbChangeStep: number;
     private rgbValue: number;
 
     public constructor(props: TimerProps, context: any) {
         super(props, context);
         this.state = {seconds: props.minutes * 60, runningIntervalID: null};
+
         this.toggleInterval = this.toggleInterval.bind(this);
+        this.surrender = this.surrender.bind(this);
+        this.completeTask = this.completeTask.bind(this);
+
         this.rgbChangeStep = 255 / this.state.seconds;
         this.rgbValue = 255;
+    }
+
+
+    public componentWillReceiveProps(nextProps: Readonly<TimerProps>) {
+        let seconds = nextProps.activeTask.assignedTime * 60;
+
+        if (seconds !== this.state.seconds) {
+            this.setState({ seconds: seconds });
+            this.rgbChangeStep = 255 / seconds;
+            this.rgbValue = 255;
+        }
+    }
+
+
+    public shouldComponentUpdate(nextProps: Readonly<TimerProps>, nextState: Readonly<TimerState>, nextContext: any): boolean {
+        return nextState.seconds != this.state.seconds || nextProps.activeTask.name != this.props.activeTask.name;
     }
 
     public renderTime(): string {
@@ -49,6 +70,10 @@ export default class Timer extends Component<TimerProps, TimerState> {
 
     private toggleInterval(pause?: boolean) {
 
+        if(this.props.activeTask.name === '') {
+            return;
+        }
+
         let intervalID = null;
 
         if(!this.state.runningIntervalID) {
@@ -71,16 +96,39 @@ export default class Timer extends Component<TimerProps, TimerState> {
         this.setState({runningIntervalID: intervalID});
     }
 
-    render(): JSX.Element {
+    private surrender(incompletedTask: Task) {
+        this.state.runningIntervalID && this.toggleInterval();
+        this.props.onIncompleteTask(incompletedTask);
+    }
+
+    private completeTask(completedTask: Task) {
+
+        if(this.props.activeTask.name === '') {
+            return;
+        }
+
+        this.state.runningIntervalID && this.toggleInterval();
+        completedTask.completedTime = completedTask.assignedTime - this.state.seconds / 60;
+        this.props.onCompleteTask(completedTask);
+
+    }
+
+    public render(): JSX.Element {
         return <div>
+
             <h1 style={{
                 color: `rgb(${255 - this.rgbValue}, ${this.rgbValue}, 0)`,
                 transition: 'all .5s',
             }}>{this.renderTime()}</h1>
+
             <button onClick={() => this.toggleInterval()}>{this.state.runningIntervalID === null ? 'Start' : 'Stop'}</button>
             <button onClick={() => this.toggleInterval(true)}>Pause</button>
 
-            <h4>Active Task: {this.props.activeTask ? this.props.activeTask : ''}</h4>
+            <button onClick={() => this.completeTask(this.props.activeTask)}>Complete</button>
+            <button onClick={() => this.surrender(this.props.activeTask)}>Surrender</button>
+
+            <h4>Active Task: {this.props.activeTask ? this.props.activeTask.name : ''}</h4>
+
         </div>;
     }
 

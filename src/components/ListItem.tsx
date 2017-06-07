@@ -27,10 +27,11 @@ export default class ListItem extends Component<ListItemProps, ListItemState> {
 
     }
 
-    render() {
+    public render() {
 
         let style: CSSProperties = {
             color: this.state.hover ? 'blue' : 'black',
+            fontWeight: 600,
             transition: 'all .5s',
             display: 'block',
             height: '30px'
@@ -40,9 +41,19 @@ export default class ListItem extends Component<ListItemProps, ListItemState> {
                     onMouseEnter={this.handleMouseHover}
                     onMouseLeave={this.handleMouseHover}
                     style={style}
-                    onDoubleClick={() => console.log('double clicked')}>
+                    onDoubleClick={() => this.props.onMark && this.props.onMark(this.props.task)} >
 
-            {this.props.task.name} <button style={{float: "right"}} onClick={event => this.props.onDelete(this.props.task, event)}>Delete</button>
+            {`${this.props.task.name} (${this.props.task.completedTime >= 0 ?
+                `completed in ${this.props.task.completedTime.toFixed(2)} minutes` :
+                this.props.task.assignedTime})`}
+
+            <button
+                style={{float: "right"}}
+                onClick={event => {
+                    console.log(this);
+                    this.props.onDelete(this.props.task, event)
+                } }> Delete
+            </button>
 
         </li>;
     }
