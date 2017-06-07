@@ -3,9 +3,43 @@ import * as React from 'react';
 import {Col, Panel} from 'react-bootstrap';
 import TasksList from './TasksList';
 import Timer from './Timer';
+import LocalStorageManager from '../model/LocalStorageManager';
+import Task from '../model/Task';
 
 
-export default class App extends React.Component<undefined, undefined> {
+export interface AppState {
+
+    tasks: LocalStorageManager<Task>;
+    completedTasks: LocalStorageManager<Task>;
+    activeTask: Task;
+
+}
+
+export default class App extends React.Component<{}, AppState> {
+
+    public constructor(props: any, context: any) {
+        super(props, context);
+
+        this.state = {tasks: new LocalStorageManager<Task>('pendingTasks'),
+            completedTasks: new LocalStorageManager<Task>('completedTasks'),
+            activeTask: null
+        };
+
+        this.handleAddOrRemoveTask = this.handleAddOrRemoveTask.bind(this);
+    }
+
+    private handleAddOrRemoveTask(completed: boolean, taskToAddOrRemove: Task, add: boolean): void {
+        let selectedManager = completed ? this.state.completedTasks : this.state.tasks;
+
+        add ? selectedManager.addObject(taskToAddOrRemove) : selectedManager.removeObject(taskToAddOrRemove.id);
+
+        if(completed) {
+            this.setState({completedTasks: selectedManager});
+        } else {
+            this.setState({tasks: selectedManager});
+        }
+
+    }
 
     public render(): JSX.Element {
         return <div>
@@ -16,16 +50,17 @@ export default class App extends React.Component<undefined, undefined> {
 
             <Col xs={12} md={4}>
 
-                <Panel header={"Timer"} bsStyle="primary">
-                    <Timer minutes={25} />
+                <Panel header={"Tasks to do"} bsStyle="primary">
+                    <TasksList completed={false} onAddTask={this.handleAddOrRemoveTask}
+                               onRemoveTask={this.handleAddOrRemoveTask} tasks={this.state.tasks.getObjects()} />
                 </Panel>
 
             </Col>
 
             <Col xs={12} md={4}>
 
-                <Panel header={"Tasks to do"} bsStyle="primary">
-                    <TasksList completed={false} />
+                <Panel header={"Timer"} bsStyle="primary">
+                    <Timer minutes={1} activeTask={this.state.activeTask}/>
                 </Panel>
 
             </Col>
@@ -33,7 +68,8 @@ export default class App extends React.Component<undefined, undefined> {
             <Col xs={12} md={4}>
 
                 <Panel header={"Completed Tasks"} bsStyle="primary">
-                    <TasksList completed={true} />
+                    <TasksList completed={true} onRemoveTask={this.handleAddOrRemoveTask}
+                               tasks={this.state.completedTasks.getObjects()}/>
                 </Panel>
 
             </Col>

@@ -1,8 +1,7 @@
 
 import * as React from 'react';
-import {Component} from 'react';
-import {Task} from '../model/Task';
-import CSSProperties = React.CSSProperties;
+import {Component, CSSProperties} from 'react';
+import Task from '../model/Task';
 
 export interface ListItemProps {
     task: Task;
@@ -23,17 +22,28 @@ export default class ListItem extends Component<ListItemProps, ListItemState> {
     }
 
     private handleMouseHover(event: any): void {
-        this.setState({hover: !this.state.hover});
+
+        this.setState({hover: event.type === "mouseenter"});
+
     }
 
     render() {
 
         let style: CSSProperties = {
-            color: this.state.hover ? 'red' : 'black'
+            color: this.state.hover ? 'blue' : 'black',
+            transition: 'all .5s',
+            display: 'block',
+            height: '30px'
         };
 
-        return <li onMouseEnter={this.handleMouseHover} onMouseLeave={this.handleMouseHover} style={style}>
-            {this.props.task.name} <button onClick={() => this.props.onDelete(this.props.task.id)}>Delete</button>
+        return <li
+                    onMouseEnter={this.handleMouseHover}
+                    onMouseLeave={this.handleMouseHover}
+                    style={style}
+                    onDoubleClick={() => console.log('double clicked')}>
+
+            {this.props.task.name} <button style={{float: "right"}} onClick={event => this.props.onDelete(this.props.task, event)}>Delete</button>
+
         </li>;
     }
 

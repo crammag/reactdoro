@@ -1,28 +1,29 @@
 
 import * as React from 'react';
 import {Component} from 'react';
-
 import SimpleForm from './SimpleForm';
 import ListItem from './ListItem';
-import LocalStorageManager from '../model/LocalStorageManager';
-import {Task} from '../model/Task';
+import Task from '../model/Task';
+
 
 export interface TasksListProps {
+    tasks: Task[];
     completed: boolean;
+    onAddTask?: any;
+    onRemoveTask: any;
 }
 
 export interface TasksListState {
-    tasks: Task[];
     inputValue?: string;
 }
 
 export default class TasksList extends Component<TasksListProps, TasksListState> {
 
-    private manager: LocalStorageManager<Task>;
-
     public constructor(props: TasksListProps, context: any) {
         super(props,context);
-        this.manager = new LocalStorageManager<Task>(props.completed ? "completedTasks" : "pendingTasks");
+
+        this.state = {inputValue: ''};
+
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmitForm = this.handleSubmitForm.bind(this);
         this.handleRemoveTask = this.handleRemoveTask.bind(this);
@@ -34,29 +35,31 @@ export default class TasksList extends Component<TasksListProps, TasksListState>
 
     private handleSubmitForm(event: any): void {
         event.preventDefault();
-
-        this.manager.addObject({id:"", name: this.state.inputValue, assignedTime:25});
-        this.setState({tasks: this.manager.getObjects()});
-
-        event.target.firstChild.value = ""; //todo check a better way to clear the input value on submit
+        this.props.onAddTask(this.props.completed, {id: null, name: this.state.inputValue, assignedTime: 25}, true);
+        this.setState({inputValue: ''});
     }
 
-    private handleRemoveTask(id: string) {
-        this.manager.removeObject(id);
-        this.setState({tasks: this.manager.getObjects()});
+    private handleRemoveTask(task:Task, event: any): void {
+        event.preventDefault();
+        event.stopPropagation();
+        this.props.onRemoveTask(this.props.completed, task, false);
     }
 
     render(): JSX.Element {
 
-        let objects = this.manager.getObjects();
+        let objects = this.props.tasks;
 
-        return <ul>
-            {objects.length != 0 ? objects.map((task,index) => {
+        return <ul style={{padding: 0}}>
+            {objects.length != 0 ? objects.map((task) => {
                     return <ListItem key={task.id} task={task} onDelete={this.handleRemoveTask} onMark={()=>{}}/>
             }) : null}
 
-            {!this.props.completed && <SimpleForm placeholder="Add a new task..." buttonText="Add"
-                                                  onChange={this.handleInputChange} onSubmit={this.handleSubmitForm} />}
+            {!this.props.completed && <SimpleForm
+                                            value={this.state.inputValue}
+                                            placeholder="Add a new task..."
+                                            buttonText="Add"
+                                            onChange={this.handleInputChange}
+                                            onSubmit={this.handleSubmitForm} />}
 
         </ul>;
     }

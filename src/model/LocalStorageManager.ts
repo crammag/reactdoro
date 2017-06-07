@@ -17,7 +17,7 @@ export default class LocalStorageManager<T extends IdentifiedEntity> {
     }
 
     public addObject(objectToAdd: T): void {
-        objectToAdd.id = new Date().toISOString();
+        objectToAdd.id = objectToAdd.id ? objectToAdd.id : new Date().toISOString();
         this.objects.push(objectToAdd);
         localStorage.setItem(this.localStorageKey, JSON.stringify(this.objects));
     }
