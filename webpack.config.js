@@ -3,6 +3,7 @@
 const webpack = require('webpack');
 const {resolve} = require('path');
 const {CheckerPlugin} = require('awesome-typescript-loader');
+const StyleLintPlugin = require('stylelint-webpack-plugin');
 
 
 module.exports = {
@@ -25,10 +26,11 @@ module.exports = {
     },
     
     resolve: {
-        extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js', '.jsx']
+        extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js', '.jsx', '.css']
     },
 
     module: {
+
         rules: [
             {
                 test: /\.js$/,
@@ -38,6 +40,14 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 use: 'awesome-typescript-loader'
+            },
+            {
+                test: /\.css$/,
+                use:  ["style-loader", "css-loader?modules", "postcss-loader",],
+            },
+            {
+                test:    /\.scss$/,
+                loaders: ["style-loader", "css-loader?modules", "postcss-loader", "sass-loader"]
             }
         ],
     },
@@ -45,13 +55,10 @@ module.exports = {
     plugins: [
         new CheckerPlugin(),
         new webpack.HotModuleReplacementPlugin(),
-        new webpack.NamedModulesPlugin()
+        new webpack.NamedModulesPlugin(),
+        new StyleLintPlugin(),
     ],
 
-    // externals: {
-    //     'react': 'React',
-    //     'react-dom': 'ReactDOM'
-    // },
 
     devServer: {
         hot: true,

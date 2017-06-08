@@ -2,6 +2,9 @@ import * as React from 'react';
 import {Component} from 'react';
 import Task from '../model/Task';
 
+// require('!style-loader!css-loader!sass-loader!./main.scss');
+
+require('!style-loader!css-loader!sass-loader!./main.scss');
 
 export interface TimerProps {
     minutes: number;
@@ -36,10 +39,15 @@ export default class Timer extends Component<TimerProps, TimerState> {
     public componentWillReceiveProps(nextProps: Readonly<TimerProps>) {
         let seconds = nextProps.activeTask.assignedTime * 60;
 
-        if (seconds !== this.state.seconds) {
+        if (seconds !== this.state.seconds && nextProps.activeTask != this.props.activeTask) {
             this.setState({ seconds: seconds });
             this.rgbChangeStep = 255 / seconds;
             this.rgbValue = 255;
+
+            //to stop the clock if it's running
+            if(this.state.runningIntervalID) {
+                this.toggleInterval();
+            }
         }
     }
 
@@ -114,6 +122,7 @@ export default class Timer extends Component<TimerProps, TimerState> {
     }
 
     public render(): JSX.Element {
+
         return <div>
 
             <h1 style={{
@@ -121,7 +130,9 @@ export default class Timer extends Component<TimerProps, TimerState> {
                 transition: 'all .5s',
             }}>{this.renderTime()}</h1>
 
-            <button onClick={() => this.toggleInterval()}>{this.state.runningIntervalID === null ? 'Start' : 'Stop'}</button>
+            {this.state.seconds === 0 ? this.surrender(this.props.activeTask) : null}
+
+            <button className="mainColor" onClick={() => this.toggleInterval()}>{this.state.runningIntervalID === null ? 'Start' : 'Stop'}</button>
             <button onClick={() => this.toggleInterval(true)}>Pause</button>
 
             <button onClick={() => this.completeTask(this.props.activeTask)}>Complete</button>
