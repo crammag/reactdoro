@@ -1,4 +1,23 @@
 
 .mainColor {
-  color: cadetblue;
+
+    > button:first-child {
+        font-weight: 600;
+        color: cadetblue;
+    }
+    
+    & button:nth-child(2) {
+        background-color: greenyellow;
+    }
+
+    > div:first-child {
+        > .secondaryColor {
+            color: blue;
+        }
+    }
+
+    & button:hover {
+        color: red;
+    }
+
 }

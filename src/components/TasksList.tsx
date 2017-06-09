@@ -1,10 +1,11 @@
 
 import * as React from 'react';
 import {Component} from 'react';
+
 import SimpleForm from './SimpleForm';
 import ListItem from './ListItem';
 import Task from '../model/Task';
-import bind from './utilities/binderUtility';
+import Bind from './utilities/binderUtility';
 
 
 export interface TasksListProps {
@@ -27,19 +28,19 @@ export default class TasksList extends Component<TasksListProps, TasksListState>
         super(props,context);
 
         this.state = {inputValue: ''};
-
-        this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleSubmitForm = this.handleSubmitForm.bind(this);
-        // this.handleRemoveTask = this.handleRemoveTask.bind(this);
     }
 
+    @Bind()
     private handleInputChange(event: any): void {
+
         event.target.type === 'number' ?
             this.inputTimeValue = event.target.value :
             this.setState({inputValue: event.target.value});
     }
 
+    @Bind()
     private handleSubmitForm(event: any): void {
+
         event.preventDefault();
 
         this.props.onAddTask(this.props.completed,
@@ -48,8 +49,9 @@ export default class TasksList extends Component<TasksListProps, TasksListState>
         this.setState({inputValue: ''});
     }
 
-    @bind
+    @Bind()
     private handleRemoveTask(task:Task, event: any): void {
+
         event.preventDefault();
         event.stopPropagation();
         this.props.onRemoveTask(this.props.completed, task, false);
@@ -57,16 +59,10 @@ export default class TasksList extends Component<TasksListProps, TasksListState>
 
     public render(): JSX.Element {
 
-        let objects = this.props.tasks;
+        let tasks = this.props.tasks;
 
         return <ul style={{padding: 1}}>
-            {objects.map((task) => {
-                    return <ListItem
-                        key={task.id}
-                        task={task}
-                        onDelete={this.handleRemoveTask}
-                        onMark={this.props.onSelectTask} />
-            })}
+            {tasks.map(task => this.renderItem(task))}
 
             {!this.props.completed && <SimpleForm
                                             value={this.state.inputValue}
@@ -76,6 +72,15 @@ export default class TasksList extends Component<TasksListProps, TasksListState>
                                             onSubmit={this.handleSubmitForm} />}
 
         </ul>;
+    }
+
+    private renderItem(task: Task): JSX.Element {
+
+        return <ListItem
+            key={task.id}
+            task={task}
+            onDelete={this.handleRemoveTask}
+            onMark={this.props.onSelectTask} />
     }
 
 }

@@ -1,10 +1,14 @@
+
 import * as React from 'react';
 import {Component} from 'react';
 import Task from '../model/Task';
+import HidingElement from './HidingElement';
+import Bind from './utilities/binderUtility';
 
 // require('!style-loader!css-loader!sass-loader!./main.scss');
+const style = require('./main.scss');
+// import style from './main.scss';
 
-require('!style-loader!css-loader!sass-loader!./main.scss');
 
 export interface TimerProps {
     minutes: number;
@@ -25,11 +29,8 @@ export default class Timer extends Component<TimerProps, TimerState> {
 
     public constructor(props: TimerProps, context: any) {
         super(props, context);
-        this.state = {seconds: props.minutes * 60, runningIntervalID: null};
 
-        this.toggleInterval = this.toggleInterval.bind(this);
-        this.surrender = this.surrender.bind(this);
-        this.completeTask = this.completeTask.bind(this);
+        this.state = {seconds: props.minutes * 60, runningIntervalID: null};
 
         this.rgbChangeStep = 255 / this.state.seconds;
         this.rgbValue = 255;
@@ -37,9 +38,12 @@ export default class Timer extends Component<TimerProps, TimerState> {
 
 
     public componentWillReceiveProps(nextProps: Readonly<TimerProps>) {
+
         let seconds = nextProps.activeTask.assignedTime * 60;
+        // let seconds = nextProps.task.time * 60; name that @cuarti would use
 
         if (seconds !== this.state.seconds && nextProps.activeTask != this.props.activeTask) {
+
             this.setState({ seconds: seconds });
             this.rgbChangeStep = 255 / seconds;
             this.rgbValue = 255;
@@ -49,11 +53,14 @@ export default class Timer extends Component<TimerProps, TimerState> {
                 this.toggleInterval();
             }
         }
+
     }
 
 
     public shouldComponentUpdate(nextProps: Readonly<TimerProps>, nextState: Readonly<TimerState>, nextContext: any): boolean {
-        return nextState.seconds != this.state.seconds || nextProps.activeTask.name != this.props.activeTask.name;
+        return  nextState.seconds != this.state.seconds
+                || nextProps.activeTask.name != this.props.activeTask.name
+                || nextState.runningIntervalID != this.state.runningIntervalID;
     }
 
     public renderTime(): string {
@@ -66,16 +73,11 @@ export default class Timer extends Component<TimerProps, TimerState> {
         return minutes + ':' + seconds;
     }
 
-    private withLeadingZeros(value: any, length: number): string { //todo ask where to put this on react
-        value = value + "";
-
-        while(value.length < length) {
-            value = 0 + value;
-        }
-
-        return value;
+    private withLeadingZeros(value: number, length: number): string {
+        return new Array(Math.max(length - value.toString().length + 1, 0)).join('0') + value;
     }
 
+    @Bind()
     private toggleInterval(pause?: boolean) {
 
         if(this.props.activeTask.name === '') {
@@ -104,11 +106,13 @@ export default class Timer extends Component<TimerProps, TimerState> {
         this.setState({runningIntervalID: intervalID});
     }
 
-    private surrender(incompletedTask: Task) {
+    @Bind()
+    private surrender(uncompletedTask: Task) {
         this.state.runningIntervalID && this.toggleInterval();
-        this.props.onIncompleteTask(incompletedTask);
+        this.props.onIncompleteTask(uncompletedTask);
     }
 
+    @Bind()
     private completeTask(completedTask: Task) {
 
         if(this.props.activeTask.name === '') {
@@ -132,11 +136,17 @@ export default class Timer extends Component<TimerProps, TimerState> {
 
             {this.state.seconds === 0 ? this.surrender(this.props.activeTask) : null}
 
-            <button className="mainColor" onClick={() => this.toggleInterval()}>{this.state.runningIntervalID === null ? 'Start' : 'Stop'}</button>
-            <button onClick={() => this.toggleInterval(true)}>Pause</button>
+            <div className={style.mainColor}>
+                <button onClick={() => this.toggleInterval()}>{this.state.runningIntervalID === null ? 'Start' : 'Stop'}</button>
+                <button onClick={() => this.toggleInterval(true)} disabled={this.state.runningIntervalID == null}>Pause</button>
 
-            <button onClick={() => this.completeTask(this.props.activeTask)}>Complete</button>
-            <button onClick={() => this.surrender(this.props.activeTask)}>Surrender</button>
+                <button onClick={() => this.completeTask(this.props.activeTask)}>Complete</button>
+                <div>
+                    <button className={style.secondaryColor} onClick={() => this.surrender(this.props.activeTask)}>Surrender</button>
+                </div>
+            </div>
+
+            {this.state.runningIntervalID && <HidingElement />}
 
             <h4>Active Task: {this.props.activeTask ? this.props.activeTask.name : ''}</h4>
 

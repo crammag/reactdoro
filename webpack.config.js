@@ -3,7 +3,7 @@
 const webpack = require('webpack');
 const {resolve} = require('path');
 const {CheckerPlugin} = require('awesome-typescript-loader');
-const StyleLintPlugin = require('stylelint-webpack-plugin');
+// const StyleLintPlugin = require('stylelint-webpack-plugin');
 
 
 module.exports = {
@@ -47,7 +47,7 @@ module.exports = {
             },
             {
                 test:    /\.scss$/,
-                loaders: ["style-loader", "css-loader?modules", "postcss-loader", "sass-loader"]
+                loaders: ["style-loader", "css-loader?modules&localIdentName=[name]-[local]-[hash:base64:3]", "sass-loader"]
             }
         ],
     },
@@ -56,7 +56,7 @@ module.exports = {
         new CheckerPlugin(),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NamedModulesPlugin(),
-        new StyleLintPlugin(),
+        // new StyleLintPlugin(),
     ],
 
 
